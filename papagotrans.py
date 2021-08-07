@@ -111,6 +111,7 @@ class Translator(object):
                 chromedriver_autoinstaller.install(True)
                 self.driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe',options=opt)
             self.alive_drive = True
+            
     def quit(self):
         if self.alive_drive:
             self.driver.quit()
