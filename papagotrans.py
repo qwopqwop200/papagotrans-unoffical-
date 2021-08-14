@@ -89,15 +89,19 @@ class Translator(object):
         if type(texts) == str:
             texts = [texts]
         self.result = [None] * len(texts)
-        for i in range(math.ceil(len(texts)/num_worker)):
-            threads = []
-            for j in range(0,len(texts[i*num_worker:(i+1)*num_worker])):
-                idx = (num_worker*i)+j
-                t = threading.Thread(target=self._translate,args=(texts[idx],source,target,honour,j,idx,))
-                t.start()
-                threads.append(t)
+        if num_worker > 1 and len(texts) > 1:
+            for i in range(math.ceil(len(texts)/num_worker)):
+                threads = []
+                for j in range(0,len(texts[i*num_worker:(i+1)*num_worker])):
+                    idx = (num_worker*i)+j
+                    t = threading.Thread(target=self._translate,args=(texts[idx],source,target,honour,j,idx,))
+                    t.start()
+                    threads.append(t)
                 for thread in threads:
-                    thread.join() 
+                    thread.join()
+        else:
+            for idx in range(len(texts)):
+                self._translate(texts[idx],source,target,honour,0,idx,)
                     
         if len(self.result) > 1 or len(self.result) == 0:
             out = self.result
@@ -113,15 +117,19 @@ class Translator(object):
         if type(texts) == str:
             texts = [texts]
         self.result = [None] * len(texts)
-        for i in range(math.ceil(len(texts)/num_worker)):
-            threads = []
-            for j in range(0,len(texts[i*num_worker:(i+1)*num_worker])):
-                idx = (num_worker*i)+j
-                t = threading.Thread(target=self._detect,args=(texts[idx],j,idx,))
-                t.start()
-                threads.append(t)
+        if num_worker > 1 and len(texts) > 1:
+            for i in range(math.ceil(len(texts)/num_worker)):
+                threads = []
+                for j in range(0,len(texts[i*num_worker:(i+1)*num_worker])):
+                    idx = (num_worker*i)+j
+                    t = threading.Thread(target=self._detect,args=(texts[idx],j,idx,))
+                    t.start()
+                    threads.append(t)
                 for thread in threads:
                     thread.join() 
+        else:
+            for idx in range(len(texts)):
+                self._detect(texts[idx],0,idx,)
                     
         if len(self.result) > 1 or len(self.result) == 0:
             out = self.result
